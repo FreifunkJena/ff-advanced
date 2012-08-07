@@ -46,8 +46,8 @@ endef
 define Package/ffrl-fsm-update/install
 	$(CP) -ap files/root/* $(1)/
 	mkdir -p $(1)/CONTROL
-	$(INSTALL_BIN) ./ipkg/ff-fsm-update.postinst $(1)/CONTROL/postinst
-	$(INSTALL_BIN) ./ipkg/ff-fsm-update.postrm $(1)/CONTROL/postrm
+	$(INSTALL_BIN) ./ipkg/ffrl-fsm-update.postinst $(1)/CONTROL/postinst
+	$(INSTALL_BIN) ./ipkg/ffrl-fsm-update.postrm $(1)/CONTROL/postrm
 #	$(INSTALL_DIR) $(1)/usr/sbin
 #	$(INSTALL_BIN) $(PKG_BUILD_DIR)/fsm $(1)/usr/sbin/
 endef
