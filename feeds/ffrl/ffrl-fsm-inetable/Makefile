@@ -47,8 +47,8 @@ endef
 define Package/ffrl-fsm-inetable/install
 	$(CP) -ap files/root/* $(1)/
 	mkdir -p $(1)/CONTROL
-	$(INSTALL_BIN) ./ipkg/ff-fsm-inetable.postinst $(1)/CONTROL/postinst
-	$(INSTALL_BIN) ./ipkg/ff-fsm-inetable.postrm $(1)/CONTROL/postrm
+	$(INSTALL_BIN) ./ipkg/ffrl-fsm-inetable.postinst $(1)/CONTROL/postinst
+	$(INSTALL_BIN) ./ipkg/ffrl-fsm-inetable.postrm $(1)/CONTROL/postrm
 #	$(INSTALL_DIR) $(1)/usr/sbin
 #	$(INSTALL_BIN) $(PKG_BUILD_DIR)/fsm $(1)/usr/sbin/
 endef
