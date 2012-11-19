@@ -1,0 +1,77 @@
+update_credentials() {
+	local username=$1
+	local password=$2
+	echo -e "$username\n$password" > /etc/openvpn/credentials.txt
+}
+
+update_ca() {
+	local ca=$1
+	echo -e "$ca" > /etc/openvpn/certificate.crt
+}
+
+update_config() {
+    local config=$1
+	echo -e "$config" > /etc/openvpn/openvpn.conf
+}
+
+update_enable()
+	local enable=$1
+	if $enable; then
+	    uci -q batch <<EOF
+set openvpn.ffrl_config=openvpn
+set openvpn.ffrl_config.enabled=1
+set openvpn.ffrl_config.config=/etc/openvpn/openvpn.conf
+EOF
+	else
+		uci -q batch <<EOF
+set openvpn.ffrl_config=openvpn
+set openvpn.ffrl_config.enabled=0
+set openvpn.ffrl_config.config=/etc/openvpn/openvpn.conf
+EOF
+    fi
+}
+# the POST input is given to this loop via HEREDOC to allow
+# manipulating variables in the current scope (especially for lazy
+# execution)
+while read key val; do
+    case "$key" in 
+	openvpn_credentials)
+		[ $(expr length "$val") -le 50 ] \
+		|| fail 400 'Feld zu groß' 
+		username=$(echo $val | awk '{print $1}')
+		password=$(echo $val | awk '{print $2}')
+	    lazy 10 update_credentials $username $password
+	    ;;
+	openvpn_config)
+	    [ $(expr length "$val") -le 500 ] \
+		|| fail 400 'Feld zu groß'
+		config=$val
+		lazy 10 update_config $config
+	    ;;
+	openvpn_ca)
+	    [ $(expr length "$val") -le 500 ] \
+		|| fail 400 'Feld zu groß'
+		config=$val
+		lazy 10 update_config $config
+	    ;;
+	openvpn_enable)
+	    openvpn_enable="$val"
+	    case "$openvpn_enable" in
+		true)
+		    lazy 00 update_geo true
+		    ;;
+		false)
+		    lazy 00 update_geo false
+		    use_router_pos=true
+		    ;;
+		*)
+		    fail
+		    ;;
+	    esac
+	    lazy 90 update_node_db
+	    lazy 99 uci commit system
+	    ;;
+	esac
+done <<EOF
+$(tr '=&' ' \n' | sort)
+EOF
